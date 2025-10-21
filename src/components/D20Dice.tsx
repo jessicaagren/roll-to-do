@@ -36,7 +36,7 @@ export default function D20Dice() {
         {rolling
           ? 'Rolling...'
           : value
-          ? `You rolled a ${value}!`
+          ? `You rolled ${value}!`
           : 'Click to roll the dice.'}
       </p>
     </div>

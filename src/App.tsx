@@ -6,7 +6,10 @@ import TodoList from './components/ToDoList';
 
 function App() {
   const [completedPoints, setCompletedPoints] = useState(0);
+  const [rolledNumber, setRolledNumber] = useState<number | null>(null);
   const totalPoints = 20;
+
+  const isCompleted = completedPoints >= totalPoints;
 
   return (
     <div className='min-h-screen bg-yellow-100 flex flex-col'>
@@ -18,11 +21,19 @@ function App() {
 
       <div className='flex flex-col md:flex-row flex-1'>
         <div className='flex-1 flex flex-col items-center justify-center p-8 border-b md:border-b-0 md:border-r border-yellow-300'>
-          <TodoList setCompletedPoints={setCompletedPoints} />
+          <div className='w-full max-w-md text-center'>
+            <TodoList
+              setCompletedPoints={setCompletedPoints}
+              rolledNumber={rolledNumber}
+            />
+          </div>
         </div>
 
         <div className='flex-1 flex flex-col items-center justify-center gap-8 p-8 text-center'>
-          <D20Dice />
+          <D20Dice
+            setRolledNumber={setRolledNumber}
+            isCompleted={isCompleted}
+          />
           <TaskLine steps={totalPoints} completed={completedPoints} />
           <p className='text-yellow-700 font-medium'>
             {completedPoints}/{totalPoints} points earned

@@ -3,12 +3,25 @@ import { initialTodos } from '../data/initialTodos';
 
 interface TodoListProps {
   setCompletedPoints: React.Dispatch<React.SetStateAction<number>>;
+  rolledNumber: number | null;
 }
 
-export default function TodoList({ setCompletedPoints }: TodoListProps) {
+export default function TodoList({
+  setCompletedPoints,
+  rolledNumber,
+}: TodoListProps) {
   const [todos, setTodos] = useState(
     initialTodos.map((task) => ({ ...task, done: false }))
   );
+  const [highlighted, setHighlighted] = useState<number | null>(null);
+
+  useEffect(() => {
+    if (rolledNumber === null) return;
+    setHighlighted(rolledNumber);
+
+    const timeout = setTimeout(() => setHighlighted(null), 1500);
+    return () => clearTimeout(timeout);
+  }, [rolledNumber]);
 
   useEffect(() => {
     const total = todos
@@ -35,6 +48,18 @@ export default function TodoList({ setCompletedPoints }: TodoListProps) {
 
   return (
     <div className='text-left space-y-6'>
+      <style>
+        {`
+        @keyframes blink {
+          0%, 100% { background-color: #facc15; } /* yellow-400 */
+          50% { background-color: #fef08a; } /* yellow-200 */
+        }
+        .animate-blink {
+          animation: blink 0.4s ease-in-out 3;
+        }
+        `}
+      </style>
+
       {Object.entries(groupedTodos)
         .sort(([a], [b]) => Number(a) - Number(b))
         .map(([value, group]) => (
@@ -47,20 +72,24 @@ export default function TodoList({ setCompletedPoints }: TodoListProps) {
                 const globalIndex = todos.findIndex(
                   (t) => t.text === todo.text
                 );
+                const isHighlighted = highlighted === num;
 
                 return (
                   <li
                     key={`${value}-${num}`}
-                    className={`flex items-center bg-yellow-200 rounded-lg p-2 text-yellow-900 shadow-sm hover:bg-yellow-300 transition cursor-pointer ${
-                      todo.done ? 'opacity-70 line-through' : ''
+                    className={`flex items-center rounded-lg p-2 text-yellow-900 shadow-sm transition cursor-pointer ${
+                      todo.done
+                        ? 'bg-yellow-300 opacity-70 line-through'
+                        : 'bg-yellow-200 hover:bg-yellow-300'
+                    } ${
+                      isHighlighted
+                        ? 'ring-4 ring-yellow-500 scale-105 animate-blink'
+                        : ''
                     }`}
                     onClick={() => toggleTodo(globalIndex)}>
                     <span className='flex-1'>
                       <strong>{num}.</strong> {todo.text}
                     </span>
-                    {/* <span className='text-xs text-yellow-700 ml-2'>
-                      (+{todo.value})
-                    </span> */}
                   </li>
                 );
               })}
